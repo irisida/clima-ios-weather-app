@@ -21,7 +21,8 @@ class WeatherViewController: UIViewController, UITextFieldDelegate, WeatherManag
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // set the WeatherManger delegate to this controller
+        // Set the WeatherManger delegate to
+        // this controller, or self.
         weatherManager.delegate = self
         searchTextField.delegate = self
     }
@@ -32,7 +33,6 @@ class WeatherViewController: UIViewController, UITextFieldDelegate, WeatherManag
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         searchTextField.endEditing(true)
-        //print(searchTextField.text!)
         return true
     }
     
@@ -53,8 +53,21 @@ class WeatherViewController: UIViewController, UITextFieldDelegate, WeatherManag
         }
     }
     
-    func didUpdateWeather(weather: WeatherModel) {
-        print(weather.formattedTemp)
+    func didUpdateWeather(_ weatherMnager: WeatherManager, weather: WeatherModel) {
+        // Wrap the UI update code into a main
+        // thread process otherwise the app
+        // will crash because the networking
+        // request is run in the background.
+        DispatchQueue.main.async {
+            self.temperatureLabel.text = weather.formattedTemp
+            self.cityLabel.text = weather.cityName
+            self.conditionImageView.image = UIImage(systemName: weather.conditionName)
+        }
+        
+    }
+    
+    func didFailWithError(error: Error) {
+        print(error)
     }
 }
 
